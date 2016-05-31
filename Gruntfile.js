@@ -38,13 +38,11 @@ module.exports = function(grunt) {
         src: 'docs',
         dest: '_site',
         config: '_config.yml',
-        raw: "version: <%= pkg.version %>"
+        raw: "version: <%= pkg.version %>",
+        serve: true
       },
       dist: {
         serve: false
-      },
-      serve: {
-        serve: true
       }
     },
 
@@ -81,7 +79,7 @@ module.exports = function(grunt) {
           }
         ],
       },
-    },
+    }
   });
 
   // Load dependencies
@@ -94,6 +92,8 @@ module.exports = function(grunt) {
 
   // Generate and format the CSS
   grunt.registerTask('default', ['sass', 'postcss', 'copy', 'jekyll:dist']);
+
+  grunt.registerTask('serve', ['sass', 'postcss', 'copy', 'jekyll']);
 
   // Publish to GitHub
   grunt.registerTask('publish', ['default', 'buildcontrol:pages']);
