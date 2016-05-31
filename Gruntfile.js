@@ -28,11 +28,8 @@ module.exports = function(grunt) {
           require('autoprefixer-core')({ browsers: ['> 5%'] })
         ]
       },
-      dist: {
-        src: 'build/*.css'
-      },
       docs: {
-        src: '_site/*.css'
+        src: 'docs/docs.css'
       }
     },
 
@@ -64,7 +61,27 @@ module.exports = function(grunt) {
           branch: 'gh-pages'
         }
       }
-    }
+    },
+
+    copy: {
+      main: {
+        files: [
+          // includes files within path
+          {
+            expand: true,
+            flatten: true,
+            src: [
+              'node_modules/octicons/octicons/octicons.eot',
+              'node_modules/octicons/octicons/octicons.svg',
+              'node_modules/octicons/octicons/octicons.ttf',
+              'node_modules/octicons/octicons/octicons.woff'
+            ],
+            dest: 'docs/fonts/',
+            filter: 'isFile'
+          }
+        ],
+      },
+    },
   });
 
   // Load dependencies
@@ -73,10 +90,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jekyll');
   grunt.loadNpmTasks('grunt-sass');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Generate and format the CSS
-  grunt.registerTask('default', ['sass', 'jekyll:dist', 'postcss']);
+  grunt.registerTask('default', ['sass', 'postcss', 'copy', 'jekyll:dist']);
 
   // Publish to GitHub
-  grunt.registerTask('publish', ['jekyll:dist', 'postcss:docs', 'buildcontrol:pages']);
+  grunt.registerTask('publish', ['default', 'buildcontrol:pages']);
 };
