@@ -9,11 +9,14 @@ module.exports = function(grunt) {
       options: {
         precision: 6,
         sourceComments: false,
-        outputStyle: 'compressed'
+        outputStyle: 'compressed',
+        includePaths: [
+          "node_modules"
+        ]
       },
       dist: {
         files: {
-          'css/primer.css': 'scss/primer.scss'
+          'build/build.css': 'index.scss'
         }
       }
     },
@@ -22,43 +25,15 @@ module.exports = function(grunt) {
     postcss: {
       options: {
         processors: [
-          require('autoprefixer-core')({ browsers: ['last 2 versions', 'ie 8', 'ie 9'] })
+          require('autoprefixer-core')({ browsers: ['> 5%'] })
         ]
       },
       dist: {
-        src: 'css/*.css'
+        src: 'build/*.css'
       },
       docs: {
         src: '_site/*.css'
       }
-    },
-
-    // Runs CSS reporting
-    parker: {
-      options: {
-        metrics: [
-          'TotalStylesheets',
-          'TotalStylesheetSize',
-          'TotalRules',
-          'TotalSelectors',
-          'TotalIdentifiers',
-          'TotalDeclarations',
-          'SelectorsPerRule',
-          'IdentifiersPerSelector',
-          'SpecificityPerSelector',
-          'TopSelectorSpecificity',
-          'TopSelectorSpecificitySelector',
-          'TotalIdSelectors',
-          'TotalUniqueColours',
-          'TotalImportantKeywords',
-          'TotalMediaQueries'
-        ],
-        file: "css/.primer-stats.md",
-        usePackage: true
-      },
-      src: [
-        'css/*.css'
-      ]
     },
 
     // Build tooling
@@ -75,7 +50,8 @@ module.exports = function(grunt) {
         src: 'docs',
         dest: '_site',
         config: '_config.yml',
-        raw: "version: <%= pkg.version %>"
+        raw: "version: <%= pkg.version %>",
+        sass_dir: "node_modules"
       },
       dist: {
         serve: false
@@ -106,11 +82,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-build-control');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jekyll');
-  grunt.loadNpmTasks('grunt-parker');
   grunt.loadNpmTasks('grunt-sass');
 
   // Generate and format the CSS
-  grunt.registerTask('default', ['sass', 'jekyll:dist', 'postcss', 'parker']);
+  grunt.registerTask('default', ['sass', 'jekyll:dist', 'postcss']);
 
   // Publish to GitHub
   grunt.registerTask('publish', ['jekyll:dist', 'postcss:docs', 'buildcontrol:pages']);
