@@ -42,7 +42,9 @@ module.exports = function(grunt) {
         serve: true
       },
       dist: {
-        serve: false
+        options: {
+          serve: false
+        }
       }
     },
 
