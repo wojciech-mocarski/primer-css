@@ -16,7 +16,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'build/build.css': 'index.scss'
+          'docs/docs.css': 'index.scss'
         }
       }
     },
@@ -36,22 +36,12 @@ module.exports = function(grunt) {
       }
     },
 
-    // Build tooling
-
-    watch: {
-      sass: {
-        files: ['scss/**/*.scss', 'docs/docs.scss'],
-        tasks: ['sass', 'postcss', 'parker']
-      }
-    },
-
     jekyll: {
       options: {
         src: 'docs',
         dest: '_site',
         config: '_config.yml',
-        raw: "version: <%= pkg.version %>",
-        sass_dir: "node_modules"
+        raw: "version: <%= pkg.version %>"
       },
       dist: {
         serve: false
