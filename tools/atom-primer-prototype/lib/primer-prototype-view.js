@@ -1,7 +1,8 @@
 'use babel'
 
+import path from 'path'
 import {CompositeDisposable, Emitter} from 'atom'
-import {render, renderString} from 'nunjucks'
+import nunjucks from 'nunjucks'
 import matter from 'gray-matter'
 
 import {OPENER_URI, OUTPUT_ID} from './constants'
@@ -13,15 +14,24 @@ export default class PrimerPrototypeView {
     this.element = document.createElement('div')
     this.root = this.element.createShadowRoot()
 
-    this.frameTemplate = require.resolve('../templates/frame.html')
+    const templatePath = path.dirname(
+      require.resolve('../templates/view.html')
+    )
+    this.env = new nunjucks.Environment([
+      new nunjucks.FileSystemLoader(templatePath),
+    ], {
+      autoescape: false,
+    })
+
+    this.frameTemplate = 'frame.html'
     this.templateData = {
       document: {
         stylesheet: require.resolve('primer-css/build/build.css')
       }
     }
 
-    this.root.innerHTML = render(
-      require.resolve('../templates/view.html'),
+    this.root.innerHTML = this.env.render(
+      'view.html',
       {OUTPUT_ID}
     )
 
@@ -61,7 +71,7 @@ export default class PrimerPrototypeView {
       try {
         const text = item.buffer.getText()
         const {data, content} = matter(text || '')
-        const rendered = renderString(content, data)
+        const rendered = this.env.renderString(content, data)
         this.renderFrame(rendered, data)
       } catch (error) {
         this.showMessage(error.message, 'error')
@@ -74,7 +84,7 @@ export default class PrimerPrototypeView {
   }
 
   renderFrame(content, data) {
-    this.output.srcdoc = render(this.frameTemplate, Object.assign(
+    this.output.srcdoc = this.env.render(this.frameTemplate, Object.assign(
       {content},
       this.templateData,
       data,
