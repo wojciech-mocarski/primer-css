@@ -12,7 +12,6 @@ export default class PrimerPrototypeView {
   constructor() {
     // Create root element
     this.element = document.createElement('div')
-    this.root = this.element.createShadowRoot()
 
     const templatePath = path.dirname(
       require.resolve('../templates/view.html')
@@ -30,13 +29,13 @@ export default class PrimerPrototypeView {
       }
     }
 
-    this.root.innerHTML = this.env.render(
+    this.element.innerHTML = this.env.render(
       'view.html',
       {OUTPUT_ID}
     )
 
     // get message and output elements
-    this.output = this.root.querySelector(`#${OUTPUT_ID}`)
+    this.output = this.element.querySelector(`#${OUTPUT_ID}`)
 
     this.subscriptions = new CompositeDisposable(
       atom.workspace.getCenter().observeActivePaneItem(item => {
@@ -70,24 +69,32 @@ export default class PrimerPrototypeView {
       return
     }
 
-    const update = () => {
-      try {
-        const text = item.buffer.getText()
-        const {data, content} = matter(text || '')
-        const rendered = this.env.renderString(content, data)
-        this.renderFrame(rendered, data)
-      } catch (error) {
-        this.showMessage({
-          title: 'Error',
-          type: 'error',
-          text: error.message,
-        })
+    if (this.item !== item) {
+      if (this.onChange) {
+        this.onChange.dispose()
       }
+      this.item = item
+      this.onChange = item.onDidStopChanging(
+        this.render.bind(this)
+      )
     }
 
-    update()
+    this.render()
+  }
 
-    const onChange = item.onDidStopChanging(update)
+  render() {
+    try {
+      const text = this.item.buffer.getText()
+      const {data, content} = matter(text)
+      const rendered = this.env.renderString(content, data)
+      this.renderFrame(rendered, data)
+    } catch (error) {
+      this.showMessage({
+        title: 'Error',
+        type: 'error',
+        text: error.message,
+      })
+    }
   }
 
   renderFrame(content, data) {

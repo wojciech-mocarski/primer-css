@@ -1,4 +1,6 @@
 ---
+body:
+  style: 'height: 100vh'
 columns:
   - title: Backlog
     automation: To do
@@ -32,7 +34,7 @@ labels:
   css: [pink]
   Primer: [blue, white]
 ---
-<div class="p-2 bg-white d-flex width-full height-full">
+<div class="p-2 bg-white d-flex flex-items-stretch width-full height-full">
   {% for column in columns %}
   <div class="project-column position-relative bg-gray-light border rounded-1 mr-2 height-full" style="min-width: 315px; max-width: 315px">
     <div class="border-bottom p-2">
