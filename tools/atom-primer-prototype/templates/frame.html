@@ -4,6 +4,16 @@
     <link rel="stylesheet" href="{{ document.stylesheet }}">
   </head>
   <body>
+    {% if message %}
+      <div class="p-2">
+        <div class="flash flash-{{ message.type }}">
+          {% if message.title %}
+            <h5>{{ message.title }}</h5>
+          {% endif %}
+          <pre class="ws-normal">{{ message.text }}</pre>
+        </div>
+      </div>
+    {% endif %}
     {{ content }}
   </body>
 </html>

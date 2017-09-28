@@ -63,7 +63,10 @@ export default class PrimerPrototypeView {
 
   update(item) {
     if (!atom.workspace.isTextEditor(item)) {
-      this.showMessage('Open a file to prototype with it.')
+      this.showMessage({
+        type: 'info',
+        text: 'Open a file to prototype with it.',
+      })
       return
     }
 
@@ -74,7 +77,11 @@ export default class PrimerPrototypeView {
         const rendered = this.env.renderString(content, data)
         this.renderFrame(rendered, data)
       } catch (error) {
-        this.showMessage(error.message, 'error')
+        this.showMessage({
+          title: 'Error',
+          type: 'error',
+          text: error.message,
+        })
       }
     }
 
@@ -91,13 +98,9 @@ export default class PrimerPrototypeView {
     ))
   }
 
-  showMessage(message, type) {
-    this.renderFrame({
-      content: `
-        <div class="flash flash-${type || 'default'}>
-          ${message}
-        </div>
-      `
+  showMessage(message) {
+    this.renderFrame('', {
+      message,
     })
   }
 
