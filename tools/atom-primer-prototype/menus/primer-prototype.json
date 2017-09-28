@@ -1,0 +1,21 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle Primer Prototyper",
+        "command": "primer-prototype:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Primer Prototyper (toggle)",
+          "command": "primer-prototype:toggle"
+        }
+      ]
+    }
+  ]
+}

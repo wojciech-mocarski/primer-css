@@ -1,0 +1,95 @@
+---
+columns:
+  - title: Backlog
+    automation: To do
+    cards:
+      - title: Card one
+        issue: 123
+        author: shawnbot
+        labels: [css]
+      - title: Card two
+        issue: 123
+        author: jonrohan
+        labels: [bug, css]
+  - title: Work in progress
+    automation: WIP
+    cards:
+      - title: Card three
+        issue: 123
+        author: shawnbot
+        labels: [bug]
+      - title: Card four
+        issue: 123
+        author: broccolini
+        labels: [bug, css, Primer]
+      - title: This is another card with a really long title and blah blah
+        issue: 123
+        author: califa
+        labels: [bug, css, Primer]
+
+labels:
+  bug: [black, white]
+  css: [pink]
+  Primer: [blue, white]
+---
+<div class="p-2 bg-white d-flex width-full height-full">
+  {% for column in columns %}
+  <div class="project-column position-relative bg-gray-light border rounded-1 mr-2 height-full" style="min-width: 315px; max-width: 315px">
+    <div class="border-bottom p-2">
+      <h3 class="f5 m-0">
+        {{ column.title }} <span class="Counter">{{ column.cards.length }}</span>
+      </h3>
+    </div>
+
+    {% for card in column.cards %}
+    <div class="bg-white p-2 border m-2 rounded-1 d-flex">
+      <div class="mr-3">
+        <img class="v-align-baseline" src="https://octicons.github.com/img/thumb/issue-opened.png" width="16">
+      </div>
+      <div class="mr-2 width-full">
+        <a href="#">
+          <h5 class="h5 d-block lh-condensed mt-0 mb-1">
+            {{ card.title }}
+          </h5>
+        </a>
+        <div class="f6 text-gray mb-1">
+          github#{{ card.issue }} opened by
+          <a class="text-gray-dark" href="#">
+            {{ card.author }}
+          </a>
+        </div>
+        <div class="labels">
+          {% for _label in card.labels %}
+            {% set label = labels[_label] %}
+            <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="d-flex flex-column flex-justify-between text-right">
+        <div>
+          <button class="btn-link btn-block text-gray f3 p-0">
+            <img class="v-align-baseline" src="https://octicons.github.com/img/thumb/chevron-down.png" width="10">
+          </button>
+        </div>
+        <div>
+          <a href="#">
+            <img class="rounded-1 v-align-bottom" alt="@{{ card.author }}" src="https://avatars0.githubusercontent.com/{{ card.author }}?v=4&s=40" width="20" height="20">
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% if column.automation %}
+    <div class="text-small bg-gray-light width-full p-2 border-top d-flex flex-justify-between">
+      <span class="text-gray-light">
+        Automated as <span class="label bg-gray text-inherit">{{ column.automation }}</span>
+      </span>
+      <div class="text-right">
+        <a href="#">Manage</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>

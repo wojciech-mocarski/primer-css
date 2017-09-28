@@ -1,0 +1,20 @@
+{
+  "name": "primer-prototype",
+  "main": "./lib/primer-prototype",
+  "version": "0.0.0",
+  "description": "A short description of your package",
+  "keywords": [],
+  "activationCommands": {
+    "atom-workspace": "primer-prototype:toggle"
+  },
+  "repository": "https://github.com/atom/primer-prototype",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "gray-matter": "^3.0.7",
+    "nunjucks": "^3.0.1",
+    "primer-css": "9.4.0"
+  }
+}
