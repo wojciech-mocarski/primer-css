@@ -4,34 +4,50 @@ columns:
     automation: To do
     cards:
       - title: Card one
-        issue: 123
+        type: note
         author: shawnbot
-        labels: [css]
-      - title: Card two
-        issue: 123
+        refs:
+          - title: hello, world
+            id: 321
+            author: shawnbot
+            assignee: broccolini
+            labels: [Primer]
+          - title: hello, another world
+            id: 321321
+            author: shawnbot
+            labels: [bug, css]
+
+      - title: Issue two
+        issue: {id: 123}
         author: jonrohan
+        assignee: shawnbot
         labels: [bug, css]
   - title: Work in progress
     automation: WIP
     cards:
       - title: Card three
-        issue: 123
+        issue: {id: 123}
         author: shawnbot
+        assignee: jonrohan
         labels: [bug]
       - title: Card four
-        issue: 123
+        issue: {id: 123}
         author: broccolini
         labels: [bug, css, Primer]
       - title: This is another card with a really long title and blah blah
-        issue: 123
+        issue: {id: 123}
         author: califa
         labels: [bug, css, Primer]
       - title: Yet another card
-        issue: 54321
+        issue: {id: 123}
         author: shawnbot
+        assignee: broccolini
         labels: [css, Primer]
+
+  - title: Done
+    cards:
       - title: One more card
-        issue: 1234
+        issue: {id: 123, status: closed}
         author: defunkt
         labels: [bug]
 
@@ -39,6 +55,10 @@ labels:
   bug: [black, white]
   css: [pink]
   Primer: [blue, white]
+
+status_colors:
+  opened: green
+  closed: red
 ---
 <div class="p-2 bg-white d-flex flex-items-stretch overflow-auto"
      style="height: 100vh; overflow-x: auto">
@@ -53,41 +73,111 @@ labels:
 
     <div class="height-full overflow-auto">
     {% for card in column.cards %}
-      <div class="bg-white p-2 border m-2 rounded-1 d-flex">
-        <div class="mr-3">
-          <img class="v-align-baseline" src="https://octicons.github.com/img/thumb/issue-opened.png" width="16">
+      <div class="bg-white border m-2 rounded-1">
+        <div class="p-2 d-flex">
+          <div class="mr-2">
+            {% set icon = "note" %}
+            {% set color = "gray-light" %}
+            {% if card.issue %}
+              {% set status = card.issue.status | default('opened') %}
+              {% set icon %}issue-{{ status }}{% endset %}
+              {% set color = status_colors[status] %}
+            {% endif %}
+            {% set class %}v-align-baseline text-{{ color }}{% endset %}
+            {% octicon icon width=16 height=16 class=class %}
+          </div>
+          <div class="mr-2 width-full">
+            {% if card.issue %}
+              <a href="#">
+                <h5 class="h5 lh-condensed mt-0 mb-1">
+                  {{ card.title }}
+                </h5>
+              </a>
+              <div class="f6 text-gray mb-1">
+                github#{{ card.issue.id }} opened by
+                <a class="text-gray-dark" href="#">
+                  {{ card.author }}
+                </a>
+              </div>
+              <div class="labels">
+                {% for _label in card.labels %}
+                  {% set label = labels[_label] %}
+                  <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="f5 lh-condensed mt-0 mb-2">
+                {{ card.title }}
+              </p>
+              <span class="text-small text-gray-light">
+                Added by <a href="#" class="text-gray-dark">{{ card.author }}</a>
+              </span>
+            {% endif %}
+          </div>
+          <div class="d-flex flex-column flex-justify-between text-right">
+            <div>
+              <button class="btn-link btn-block text-center text-gray f3 p-0">
+                {% octicon "kebab-horizontal" width=20 height=14 class="v-align-top" %}
+              </button>
+            </div>
+            {% if card.assignee %}
+            <div>
+              <a href="#">
+                <img class="rounded-1 v-align-bottom" alt="@{{ card.assignee }}" src="https://avatars0.githubusercontent.com/{{ card.assignee }}?s=40" width="20" height="20">
+              </a>
+            </div>
+            {% endif %}
+          </div>
         </div>
-        <div class="mr-2 width-full">
-          <a href="#">
-            <h5 class="h5 d-block lh-condensed mt-0 mb-1">
-              {{ card.title }}
-            </h5>
-          </a>
-          <div class="f6 text-gray mb-1">
-            github#{{ card.issue }} opened by
-            <a class="text-gray-dark" href="#">
-              {{ card.author }}
-            </a>
+        {% if card.refs %}
+        <details class="p-0 m-0 border-top bg-white" open>
+          <summary class="text-gray-light p-2 m-0 d-flex flex-justify-between">
+            <div class="mr-2">
+              <h5 class="text-normal mb-0">{{ card.refs.length }} Reference{% if card.refs.length != 1 %}s{% endif %}</h5>
+            </div>
+            <span class="">
+              {% octicon "fold" height=16 width=20 %}
+            </span>
+          </summary>
+          {% for issue in card.refs %}
+          <div class="p-2 d-flex border-top">
+            <div class="mr-2">
+              {% set status = card.issue.status | default('opened') %}
+              {% set icon %}issue-{{ status }}{% endset %}
+              {% set color = status_colors[status] %}
+              {% set class %}v-align-baseline text-{{ color }}{% endset %}
+              {% octicon icon width=16 height=16 class=class %}
+            </div>
+            <div class="mr-2 width-full">
+              <a href="#">
+                <h5 class="h5 lh-condensed mt-0 mb-1">
+                  {{ issue.title }}
+                </h5>
+              </a>
+              <div class="f6 text-gray mb-1">
+                github#{{ issue.id }} opened by
+                <a class="text-gray-dark" href="#">
+                  {{ issue.author }}
+                </a>
+              </div>
+              <div class="labels">
+                {% for _label in issue.labels %}
+                  {% set label = labels[_label] %}
+                  <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% if issue.assignee %}
+            <div class="d-flex flex-column flex-justify-end">
+              <a href="#">
+                <img class="rounded-1 v-align-bottom" alt="@{{ issue.assignee }}" src="https://avatars0.githubusercontent.com/{{ issue.assignee }}?s=40" width="20" height="20">
+              </a>
+            </div>
+            {% endif %}
           </div>
-          <div class="labels">
-            {% for _label in card.labels %}
-              {% set label = labels[_label] %}
-              <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
-            {% endfor %}
-          </div>
-        </div>
-        <div class="d-flex flex-column flex-justify-between text-right">
-          <div>
-            <button class="btn-link btn-block text-gray f3 p-0">
-              <img class="v-align-baseline" src="https://octicons.github.com/img/thumb/chevron-down.png" width="10">
-            </button>
-          </div>
-          <div>
-            <a href="#">
-              <img class="rounded-1 v-align-bottom" alt="@{{ card.author }}" src="https://avatars0.githubusercontent.com/{{ card.author }}?v=4&s=40" width="20" height="20">
-            </a>
-          </div>
-        </div>
+          {% endfor %}
+        </details>
+        {% endif %}
       </div>
     {% endfor %}
     </div>
@@ -107,3 +197,14 @@ labels:
   </div>
   {% endfor %}
 </div>
+
+<style>
+  summary {
+    display: block;
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+</style>
