@@ -1,5 +1,5 @@
 ---
-title: Project title
+title: This is a really long project title
 columns:
   - title: Backlog
     automation: To do
@@ -13,8 +13,9 @@ columns:
             author: shawnbot
             assignee: broccolini
             labels: [Primer]
-          - title: hello, another world
-            id: 321321
+          - title: This is a Primer issue
+            repo: primer-css
+            id: 303
             author: shawnbot
             status: closed
             labels: [bug, css]
@@ -53,7 +54,7 @@ columns:
         author: defunkt
         labels: [bug]
 
-labels:
+label_colors:
   bug: [black, white]
   css: [pink]
   Primer: [blue, white]
@@ -61,29 +62,113 @@ labels:
 status_colors:
   opened: green
   closed: red
+  merged: purple
 ---
+
+{% macro ref_icon(ref, symbol='note', color='gray-light') %}
+  {% if ref %}
+    {% set type = ref.type | default("issue") %}
+    {% set status = ref.status | default("opened") %}
+    {% set symbol %}{{ type }}-{{ status }}{% endset %}
+    {% set color = status_colors[status] %}
+  {% endif %}
+  {% set class %}v-align-baseline text-{{ color }}{% endset %}
+  {% octicon symbol width=16 height=16 class=class %}
+{% endmacro %}
+
+{% macro ref_card(ref, class="") %}
+<div class="{{ class }}">
+  <div class="mr-2">
+    {{ ref_icon(ref) }}
+  </div>
+  <div class="mr-2 width-full">
+    {{ issue_title(ref) }}
+    {{ issue_byline(ref) }}
+    {{ ref_labels(ref.labels) }}
+  </div>
+  {% if ref.assignee %}
+  <div class="d-flex flex-column flex-justify-end">
+    {{ avatar(ref.assignee) }}
+  </div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro issue_title(issue) %}
+  <a href="#">
+    <h5 class="h5 lh-condensed mt-0 mb-1">
+      {{ issue.title }}
+    </h5>
+  </a>
+{% endmacro %}
+
+{% macro issue_byline(issue) %}
+  <div class="f6 text-gray mb-1">
+    {{ issue.repo | default("github") }}#{{ issue.id | default(12345) }} opened by
+    <a class="text-gray-dark" href="#">
+      {{ issue.author }}
+    </a>
+  </div>
+{% endmacro %}
+
+{% macro ref_labels(labels) %}
+  {% if labels %}
+    <div class="labels">
+      {% for _label in labels %}
+        {% set colors = label_colors[_label] %}
+        <span class="label" style="background: {{ colors[0] }}; color: {{ colors[1] | default('black') }};">{{ _label }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro avatar(user) %}
+<a href="#">
+  <img class="rounded-1 v-align-bottom" alt="@{{ user }}" src="https://avatars0.githubusercontent.com/{{ user }}?s=40" width="20" height="20">
+</a>
+{% endmacro %}
+
 <main class="d-flex flex-column" style="height: 100vh">
-  <header class="p-3 border-bottom d-flex flex-items-center flex-justify-between">
-    <h1 class="f2 m-0">{{ title }}</h1>
-    <form class="text-dark-gray" disabled>
+  <header class="p-3 border-bottom d-flex flex-items-end flex-justify-between">
+    <h1 class="f3 lh-condensed mb-0 mr-4">{{ title }}</h1>
+    <form class="text-dark-gray no-wrap" disabled>
       <span class="position-relative">
-        <input type="search" class="form-control input-sm mr-2 pl-4">
+        <input class="form-control input-sm mr-2 pl-4"
+               type="search" placeholder="Filter cards">
         {% octicon 'search' width=14 class="position-absolute text-gray-light left-0 bottom-0 ml-2 mt-2" %}
       </span>
-      <button class="btn btn-sm text-inherit mr-1">{% octicon 'plus' %} Add cards</button>
-      <button class="btn btn-sm selected text-inherit mr-1">{% octicon 'screen-full' %} Fullscreen</button>
-      <button class="btn btn-sm text-inherit">{% octicon 'three-bars' %} Menu</button>
+      <button class="btn btn-sm text-inherit mr-1">
+        {% octicon "plus" %} Add cards
+      </button>
+      <button class="btn btn-sm selected text-inherit mr-1">
+        {% octicon "screen-full" %} Fullscreen
+      </button>
+      <details class="details-modal d-inline-block position-relative">
+        <summary class="btn btn-sm d-inline-block text-inherit">
+          {% octicon "three-bars" %} Menu
+        </summary>
+        <div class="p-2 position-absolute bg-white border rounded-1 top-100 right-0 mt-2 box-shadow">
+          Yo, this is a menu.
+        </div>
+      </details>
     </form>
   </header>
   <div class="p-2 bg-white d-flex flex-items-stretch height-full overflow-auto"
        style="overflow-x: auto">
     {% for column in columns %}
-    <div class="project-column position-relative bg-gray-light border rounded-1 mr-2 height-full overflow-hidden d-flex flex-column"
-         style="min-width: 315px; max-width: 315px">
-      <div class="border-bottom p-2">
-        <h3 class="f5 m-0">
+    <div class="project-column position-relative bg-gray-light border rounded-1 mr-2 height-full overflow-hidden d-flex flex-column">
+      <div class="border-bottom p-2 d-flex flex-justify-between">
+        <h3 class="f5 mb-1">
           {{ column.title }} <span class="Counter">{{ column.cards.length }}</span>
         </h3>
+        <div class="text-gray mr-1">
+          <button class="btn-link text-inherit mr-2">
+            {% octicon "pencil" height=16 class="tooltipped tooltipped-ne" "aria-label"="Edit column" %}
+          </button>
+          <button class="btn-link text-inherit">
+            {% octicon "plus" height=16 class="tooltipped tooltipped-ne" "aria-label"="Add a note" %}
+          </button>
+        </div>
       </div>
 
       <div class="height-full overflow-auto">
@@ -91,35 +176,13 @@ status_colors:
         <div class="bg-white border m-2 rounded-1">
           <div class="p-2 d-flex">
             <div class="mr-2">
-              {% set icon = "note" %}
-              {% set color = "gray-light" %}
-              {% if card.issue %}
-                {% set status = card.issue.status | default('opened') %}
-                {% set icon %}issue-{{ status }}{% endset %}
-                {% set color = status_colors[status] %}
-              {% endif %}
-              {% set class %}v-align-baseline text-{{ color }}{% endset %}
-              {% octicon icon width=16 height=16 class=class %}
+              {{ ref_icon(card.issue) }}
             </div>
             <div class="mr-2 width-full">
               {% if card.issue %}
-                <a href="#">
-                  <h5 class="h5 lh-condensed mt-0 mb-1">
-                    {{ card.title }}
-                  </h5>
-                </a>
-                <div class="f6 text-gray mb-1">
-                  github#{{ card.issue.id }} opened by
-                  <a class="text-gray-dark" href="#">
-                    {{ card.author }}
-                  </a>
-                </div>
-                <div class="labels">
-                  {% for _label in card.labels %}
-                    {% set label = labels[_label] %}
-                    <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
-                  {% endfor %}
-                </div>
+                {{ issue_title(card) }}
+                {{ issue_byline(card) }}
+                {{ ref_labels(card.labels) }}
               {% else %}
                 <p class="f5 lh-condensed mt-0 mb-2">
                   {{ card.title }}
@@ -137,62 +200,28 @@ status_colors:
               </div>
               {% if card.assignee %}
               <div>
-                <a href="#">
-                  <img class="rounded-1 v-align-bottom" alt="@{{ card.assignee }}" src="https://avatars0.githubusercontent.com/{{ card.assignee }}?s=40" width="20" height="20">
-                </a>
+                {{ avatar(card.assignee) }}
               </div>
               {% endif %}
             </div>
           </div>
+
           {% if card.refs %}
-          <details class="p-0 m-0 border-top bg-white">
-            <summary class="text-gray-light p-2 m-0 d-flex flex-justify-between">
-              <div class="mr-2">
-                <h5 class="text-normal mb-0">{{ card.refs.length }} Reference{% if card.refs.length != 1 %}s{% endif %}</h5>
-              </div>
-              <span class="">
-                {% octicon "fold" height=16 width=20 %}
-              </span>
-            </summary>
-            {% for issue in card.refs %}
-            <div class="p-2 d-flex border-top">
-              <div class="mr-2">
-                {% set status = issue.status | default('opened') %}
-                {% set icon %}issue-{{ status }}{% endset %}
-                {% set color = status_colors[status] %}
-                {% set class %}v-align-baseline text-{{ color }}{% endset %}
-                {% octicon icon width=16 height=16 class=class %}
-              </div>
-              <div class="mr-2 width-full">
-                <a href="#">
-                  <h5 class="h5 lh-condensed mt-0 mb-1">
-                    {{ issue.title }}
-                  </h5>
-                </a>
-                <div class="f6 text-gray mb-1">
-                  github#{{ issue.id }} opened by
-                  <a class="text-gray-dark" href="#">
-                    {{ issue.author }}
-                  </a>
+            <details class="p-0 m-0 border-top bg-white">
+              <summary class="text-gray-light p-2 m-0 d-flex flex-justify-between">
+                <div class="mr-2">
+                  <h5 class="text-normal mb-0">{{ card.refs.length }} Reference{% if card.refs.length != 1 %}s{% endif %}</h5>
                 </div>
-                <div class="labels">
-                  {% for _label in issue.labels %}
-                    {% set label = labels[_label] %}
-                    <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
-                  {% endfor %}
-                </div>
-              </div>
-              {% if issue.assignee %}
-              <div class="d-flex flex-column flex-justify-end">
-                <a href="#">
-                  <img class="rounded-1 v-align-bottom" alt="@{{ issue.assignee }}" src="https://avatars0.githubusercontent.com/{{ issue.assignee }}?s=40" width="20" height="20">
-                </a>
-              </div>
-              {% endif %}
-            </div>
-            {% endfor %}
-          </details>
+                <span class="">
+                  {% octicon "fold" height=16 width=20 %}
+                </span>
+              </summary>
+              {% for issue in card.refs %}
+                {{ ref_card(issue, class="p-2 d-flex border-top") }}
+              {% endfor %}
+            </details>
           {% endif %}
+
         </div>
       {% endfor %}
       </div>
@@ -215,6 +244,15 @@ status_colors:
 </main>
 
 <style>
+  :root {
+    --column-width: 315px;
+  }
+
+  .project-column {
+    min-width: var(--column-width);
+    max-width: var(--column-width);
+  }
+
   summary {
     display: block;
     cursor: pointer;
@@ -222,5 +260,26 @@ status_colors:
 
   summary::-webkit-details-marker {
     display: none;
+  }
+
+  .details-modal > summary {
+    position: relative;
+  }
+
+  .details-modal[open] > summary::before {
+    content: "";
+    display: block;
+    pointer-events: all;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1000;
+  }
+
+  .details-modal[open] > :not(summary) {
+    z-index: 1001;
   }
 </style>
