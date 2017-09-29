@@ -1,4 +1,5 @@
 ---
+title: Project title
 columns:
   - title: Backlog
     automation: To do
@@ -61,143 +62,157 @@ status_colors:
   opened: green
   closed: red
 ---
-<div class="p-2 bg-white d-flex flex-items-stretch overflow-auto"
-     style="height: 100vh; overflow-x: auto">
-  {% for column in columns %}
-  <div class="project-column position-relative bg-gray-light border rounded-1 mr-2 height-full overflow-hidden d-flex flex-column"
-       style="min-width: 315px; max-width: 315px">
-    <div class="border-bottom p-2">
-      <h3 class="f5 m-0">
-        {{ column.title }} <span class="Counter">{{ column.cards.length }}</span>
-      </h3>
-    </div>
+<main class="d-flex flex-column" style="height: 100vh">
+  <header class="p-3 border-bottom d-flex flex-items-center flex-justify-between">
+    <h1 class="f2 m-0">{{ title }}</h1>
+    <form class="text-dark-gray" disabled>
+      <span class="position-relative">
+        <input type="search" class="form-control input-sm mr-2 pl-4">
+        {% octicon 'search' width=14 class="position-absolute text-gray-light left-0 bottom-0 ml-2 mt-2" %}
+      </span>
+      <button class="btn btn-sm text-inherit mr-1">{% octicon 'plus' %} Add cards</button>
+      <button class="btn btn-sm selected text-inherit mr-1">{% octicon 'screen-full' %} Fullscreen</button>
+      <button class="btn btn-sm text-inherit">{% octicon 'three-bars' %} Menu</button>
+    </form>
+  </header>
+  <div class="p-2 bg-white d-flex flex-items-stretch height-full overflow-auto"
+       style="overflow-x: auto">
+    {% for column in columns %}
+    <div class="project-column position-relative bg-gray-light border rounded-1 mr-2 height-full overflow-hidden d-flex flex-column"
+         style="min-width: 315px; max-width: 315px">
+      <div class="border-bottom p-2">
+        <h3 class="f5 m-0">
+          {{ column.title }} <span class="Counter">{{ column.cards.length }}</span>
+        </h3>
+      </div>
 
-    <div class="height-full overflow-auto">
-    {% for card in column.cards %}
-      <div class="bg-white border m-2 rounded-1">
-        <div class="p-2 d-flex">
-          <div class="mr-2">
-            {% set icon = "note" %}
-            {% set color = "gray-light" %}
-            {% if card.issue %}
-              {% set status = card.issue.status | default('opened') %}
-              {% set icon %}issue-{{ status }}{% endset %}
-              {% set color = status_colors[status] %}
-            {% endif %}
-            {% set class %}v-align-baseline text-{{ color }}{% endset %}
-            {% octicon icon width=16 height=16 class=class %}
-          </div>
-          <div class="mr-2 width-full">
-            {% if card.issue %}
-              <a href="#">
-                <h5 class="h5 lh-condensed mt-0 mb-1">
-                  {{ card.title }}
-                </h5>
-              </a>
-              <div class="f6 text-gray mb-1">
-                github#{{ card.issue.id }} opened by
-                <a class="text-gray-dark" href="#">
-                  {{ card.author }}
-                </a>
-              </div>
-              <div class="labels">
-                {% for _label in card.labels %}
-                  {% set label = labels[_label] %}
-                  <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
-                {% endfor %}
-              </div>
-            {% else %}
-              <p class="f5 lh-condensed mt-0 mb-2">
-                {{ card.title }}
-              </p>
-              <span class="text-small text-gray-light">
-                Added by <a href="#" class="text-gray-dark">{{ card.author }}</a>
-              </span>
-            {% endif %}
-          </div>
-          <div class="d-flex flex-column flex-justify-between text-right">
-            <div>
-              <button class="btn-link btn-block text-center text-gray f3 p-0">
-                {% octicon "kebab-horizontal" width=20 height=14 class="v-align-top" %}
-              </button>
-            </div>
-            {% if card.assignee %}
-            <div>
-              <a href="#">
-                <img class="rounded-1 v-align-bottom" alt="@{{ card.assignee }}" src="https://avatars0.githubusercontent.com/{{ card.assignee }}?s=40" width="20" height="20">
-              </a>
-            </div>
-            {% endif %}
-          </div>
-        </div>
-        {% if card.refs %}
-        <details class="p-0 m-0 border-top bg-white">
-          <summary class="text-gray-light p-2 m-0 d-flex flex-justify-between">
+      <div class="height-full overflow-auto">
+      {% for card in column.cards %}
+        <div class="bg-white border m-2 rounded-1">
+          <div class="p-2 d-flex">
             <div class="mr-2">
-              <h5 class="text-normal mb-0">{{ card.refs.length }} Reference{% if card.refs.length != 1 %}s{% endif %}</h5>
-            </div>
-            <span class="">
-              {% octicon "fold" height=16 width=20 %}
-            </span>
-          </summary>
-          {% for issue in card.refs %}
-          <div class="p-2 d-flex border-top">
-            <div class="mr-2">
-              {% set status = issue.status | default('opened') %}
-              {% set icon %}issue-{{ status }}{% endset %}
-              {% set color = status_colors[status] %}
+              {% set icon = "note" %}
+              {% set color = "gray-light" %}
+              {% if card.issue %}
+                {% set status = card.issue.status | default('opened') %}
+                {% set icon %}issue-{{ status }}{% endset %}
+                {% set color = status_colors[status] %}
+              {% endif %}
               {% set class %}v-align-baseline text-{{ color }}{% endset %}
               {% octicon icon width=16 height=16 class=class %}
             </div>
             <div class="mr-2 width-full">
-              <a href="#">
-                <h5 class="h5 lh-condensed mt-0 mb-1">
-                  {{ issue.title }}
-                </h5>
-              </a>
-              <div class="f6 text-gray mb-1">
-                github#{{ issue.id }} opened by
-                <a class="text-gray-dark" href="#">
-                  {{ issue.author }}
+              {% if card.issue %}
+                <a href="#">
+                  <h5 class="h5 lh-condensed mt-0 mb-1">
+                    {{ card.title }}
+                  </h5>
+                </a>
+                <div class="f6 text-gray mb-1">
+                  github#{{ card.issue.id }} opened by
+                  <a class="text-gray-dark" href="#">
+                    {{ card.author }}
+                  </a>
+                </div>
+                <div class="labels">
+                  {% for _label in card.labels %}
+                    {% set label = labels[_label] %}
+                    <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="f5 lh-condensed mt-0 mb-2">
+                  {{ card.title }}
+                </p>
+                <span class="text-small text-gray-light">
+                  Added by <a href="#" class="text-gray-dark">{{ card.author }}</a>
+                </span>
+              {% endif %}
+            </div>
+            <div class="d-flex flex-column flex-justify-between text-right">
+              <div>
+                <button class="btn-link btn-block text-center text-gray f3 p-0">
+                  {% octicon "kebab-horizontal" width=20 height=14 class="v-align-top" %}
+                </button>
+              </div>
+              {% if card.assignee %}
+              <div>
+                <a href="#">
+                  <img class="rounded-1 v-align-bottom" alt="@{{ card.assignee }}" src="https://avatars0.githubusercontent.com/{{ card.assignee }}?s=40" width="20" height="20">
                 </a>
               </div>
-              <div class="labels">
-                {% for _label in issue.labels %}
-                  {% set label = labels[_label] %}
-                  <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
-                {% endfor %}
-              </div>
+              {% endif %}
             </div>
-            {% if issue.assignee %}
-            <div class="d-flex flex-column flex-justify-end">
-              <a href="#">
-                <img class="rounded-1 v-align-bottom" alt="@{{ issue.assignee }}" src="https://avatars0.githubusercontent.com/{{ issue.assignee }}?s=40" width="20" height="20">
-              </a>
-            </div>
-            {% endif %}
           </div>
-          {% endfor %}
-        </details>
-        {% endif %}
+          {% if card.refs %}
+          <details class="p-0 m-0 border-top bg-white">
+            <summary class="text-gray-light p-2 m-0 d-flex flex-justify-between">
+              <div class="mr-2">
+                <h5 class="text-normal mb-0">{{ card.refs.length }} Reference{% if card.refs.length != 1 %}s{% endif %}</h5>
+              </div>
+              <span class="">
+                {% octicon "fold" height=16 width=20 %}
+              </span>
+            </summary>
+            {% for issue in card.refs %}
+            <div class="p-2 d-flex border-top">
+              <div class="mr-2">
+                {% set status = issue.status | default('opened') %}
+                {% set icon %}issue-{{ status }}{% endset %}
+                {% set color = status_colors[status] %}
+                {% set class %}v-align-baseline text-{{ color }}{% endset %}
+                {% octicon icon width=16 height=16 class=class %}
+              </div>
+              <div class="mr-2 width-full">
+                <a href="#">
+                  <h5 class="h5 lh-condensed mt-0 mb-1">
+                    {{ issue.title }}
+                  </h5>
+                </a>
+                <div class="f6 text-gray mb-1">
+                  github#{{ issue.id }} opened by
+                  <a class="text-gray-dark" href="#">
+                    {{ issue.author }}
+                  </a>
+                </div>
+                <div class="labels">
+                  {% for _label in issue.labels %}
+                    {% set label = labels[_label] %}
+                    <span class="label" style="background: {{ label[0] }}; color: {{ label[1] | default('black') }};">{{ _label }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+              {% if issue.assignee %}
+              <div class="d-flex flex-column flex-justify-end">
+                <a href="#">
+                  <img class="rounded-1 v-align-bottom" alt="@{{ issue.assignee }}" src="https://avatars0.githubusercontent.com/{{ issue.assignee }}?s=40" width="20" height="20">
+                </a>
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </details>
+          {% endif %}
+        </div>
+      {% endfor %}
       </div>
-    {% endfor %}
-    </div>
 
-    {% if column.automation %}
-    <div class="">
-      <div class=" text-small bg-gray-light p-2 border-top d-flex flex-justify-between">
-        <span class="text-gray-light">
-          Automated as <span class="label bg-gray text-inherit">{{ column.automation }}</span>
-        </span>
-        <div class="text-right">
-          <a href="#">Manage</a>
+      {% if column.automation %}
+      <div class="">
+        <div class=" text-small bg-gray-light p-2 border-top d-flex flex-justify-between">
+          <span class="text-gray-light">
+            Automated as <span class="label bg-gray text-inherit">{{ column.automation }}</span>
+          </span>
+          <div class="text-right">
+            <a href="#">Manage</a>
+          </div>
         </div>
       </div>
+      {% endif %}
     </div>
-    {% endif %}
+    {% endfor %}
   </div>
-  {% endfor %}
-</div>
+</main>
 
 <style>
   summary {
