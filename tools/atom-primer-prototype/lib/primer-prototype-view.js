@@ -1,11 +1,13 @@
 'use babel'
 
-import path from 'path'
 import {CompositeDisposable, Emitter} from 'atom'
+
+import path from 'path'
 import nunjucks from 'nunjucks'
 import matter from 'gray-matter'
 
 import {OPENER_URI, OUTPUT_ID} from './constants'
+import OcticonTag from './tags/octicon'
 
 export default class PrimerPrototypeView {
 
@@ -16,11 +18,14 @@ export default class PrimerPrototypeView {
     const templatePath = path.dirname(
       require.resolve('../templates/view.html')
     )
+
     this.env = new nunjucks.Environment([
       new nunjucks.FileSystemLoader(templatePath),
     ], {
       autoescape: false,
     })
+
+    this.env.addExtension('Octicon', new OcticonTag())
 
     this.frameTemplate = 'frame.html'
     this.templateData = {
