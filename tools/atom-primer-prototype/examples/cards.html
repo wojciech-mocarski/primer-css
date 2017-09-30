@@ -129,13 +129,17 @@ status_colors:
 {% endmacro %}
 
 <main class="d-flex flex-column" style="height: 100vh">
-  <header class="p-3 border-bottom d-flex flex-items-end flex-justify-between">
-    <h1 class="f3 lh-condensed mb-0 mr-4">{{ title }}</h1>
+  <header class="p-3 border-bottom d-md-flex flex-items-end flex-justify-between">
+    <h1 class="f3 lh-condensed mb-2 mr-4 mb-md-0">
+      {{ title }}
+    </h1>
     <form class="text-dark-gray no-wrap" disabled>
       <span class="position-relative">
         <input class="form-control input-sm mr-2 pl-4"
                type="search" placeholder="Filter cards">
-        {% octicon 'search' width=14 class="position-absolute text-gray-light left-0 bottom-0 ml-2 mt-2" %}
+        {% octicon 'search'
+           class="position-absolute text-gray-light top-0 m-1"
+           width=14 style="left: 2px" %}
       </span>
       <button class="btn btn-sm text-inherit mr-1">
         {% octicon "plus" %} Add cards
@@ -147,13 +151,14 @@ status_colors:
         <summary class="btn btn-sm d-inline-block text-inherit">
           {% octicon "three-bars" %} Menu
         </summary>
-        <div class="p-2 position-absolute bg-white border rounded-1 top-100 right-0 mt-2 box-shadow">
+        <div class="p-2 position-absolute bg-white border rounded-1 top-100 right-0 mt-2 box-shadow"
+             style="min-width: 200px">
           Yo, this is a menu.
         </div>
       </details>
     </form>
   </header>
-  <div class="p-2 bg-white d-flex flex-items-stretch height-full overflow-auto"
+  <div class="p-2 bg-white d-flex flex-items-stretch height-full overflow-auto mr-2"
        style="overflow-x: auto">
     {% for column in columns %}
     <div class="project-column position-relative bg-gray-light border rounded-1 mr-2 height-full overflow-hidden d-flex flex-column">
@@ -212,7 +217,10 @@ status_colors:
                 <div class="mr-2">
                   <h5 class="text-normal mb-0">{{ card.refs.length }} Reference{% if card.refs.length != 1 %}s{% endif %}</h5>
                 </div>
-                <span class="">
+                <span class="details-content--closed">
+                  {% octicon "unfold" height=16 width=20 %}
+                </span>
+                <span class="details-content--open">
                   {% octicon "fold" height=16 width=20 %}
                 </span>
               </summary>
@@ -264,6 +272,11 @@ status_colors:
 
   .details-modal > summary {
     position: relative;
+  }
+
+  details:not([open]) > summary .details-content--open,
+  details[open] > summary .details-content--closed {
+    display: none;
   }
 
   .details-modal[open] > summary::before {
