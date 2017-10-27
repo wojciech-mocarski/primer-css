@@ -3,10 +3,12 @@
 ### Added
 - New module `primer-subhead`. The Subhead is a simple header with a bottom border. It&#39;s designed to be used on settings and configuration pages.
 - Importing `.input-group` into `primer-forms` module.
+- New module `primer-marketing-buttons`. Buttons for marketing websites at GitHub
 
 ### Removed
 - Removing `primer-cards` module.
 - Removing `.form-cards` styles.
+- Removing `.btn-large` from `primer-buttons` module and adding to `primer-marketing-buttons`.
 
 # 9.6.0
 
